@@ -6,7 +6,7 @@ import { MatTableModule } from '@angular/material/table';
 import {
   NgMatTableComponent,
   TAG_NAME as NgMatTableComponentTagName,
-} from './components/wrapped-angular-table.component';
+} from './components/angular-table-wrapped-in-a-web-component';
 
 @NgModule({
   imports: [BrowserModule, MatTableModule],

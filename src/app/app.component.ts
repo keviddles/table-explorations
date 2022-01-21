@@ -2,8 +2,8 @@ import { Component } from '@angular/core';
 import { data, cols } from './fake-data';
 import './components/web-component-table-accepting-a-render-method';
 import './components/web-component-table-accepting-rendering-via-slots';
-import './components/wrapped-angular-table.component';
-import './components/angular-inspired-web-component-table';
+import './components/angular-table-wrapped-in-a-web-component';
+import './components/web-component-table-inspired-by-angular';
 import { styles } from './components/web-component-table-built-as-html';
 
 const colKeys = cols.map((col) => col.key);

@@ -1,9 +1,5 @@
-import {
-  Component,
-  Input,
-} from '@angular/core';
-
-export const TAG_NAME = 'wrapped-angular-table';
+import { Component, Input } from '@angular/core';
+export const TAG_NAME = 'angular-table-wrapped-in-a-web-component';
 
 @Component({
   template: `
@@ -22,17 +18,26 @@ export const TAG_NAME = 'wrapped-angular-table';
       </ng-container>
       <ng-container matColumnDef="details">
         <th mat-header-cell *matHeaderCellDef>Details</th>
-        <td mat-cell *matCellDef="let row; let rowId = index">{{rowId}}</td>
+        <td mat-cell *matCellDef="let row; let rowId = index">
+          <a href="detail/{{rowId}}">Link for {{rowId}}</a>
+        </td>
       </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="cols"></tr>
     <tr mat-row *matRowDef="let row; columns: cols;"></tr>
   </table>
   `,
-  styles: [`
+  styles: [
+    `
+    * {
+      font: inherit;
+    }
     table {
       border-collapse: collapse;
       background: inherit;
+    }
+    table tr {
+      height: auto;
     }
     table th, table td {
       text-align: left;
@@ -43,6 +48,7 @@ export const TAG_NAME = 'wrapped-angular-table';
       border: 1px solid yellow;
       text-transform: uppercase;
       color: green;
+      font-weight: 700;
     }
     table td {
       border: 1px solid red;
@@ -56,7 +62,8 @@ export const TAG_NAME = 'wrapped-angular-table';
     a:hover {
       text-decoration: underline;
     }
-  `],
+  `,
+  ],
 })
 export class NgMatTableComponent {
   @Input() data: Record<string, any>[];
