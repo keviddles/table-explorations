@@ -1,8 +1,9 @@
-import { LitElement, html, css, TemplateResult } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import { LitElement, html, css, customElement, property } from 'lit-element';
+// import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+// import { customElement, property, state } from 'lit/decorators.js';
+// import { LitElement, html, css, TemplateResult } from 'lit';
 
-type CellRenderer = (rowId: number) => TemplateResult;
+type CellRenderer = (rowId: number) => any;
 
 const Handlebars = window['Handlebars'];
 
@@ -14,10 +15,10 @@ class TableAngularMimic extends LitElement {
   @property({ type: Array })
   cols: Array<string>;
 
-  @state()
+  @property()
   private _headerCells = [];
 
-  @state()
+  @property()
   private _cellRenderers: Array<CellRenderer> = [];
 
   static styles = css`
@@ -47,51 +48,59 @@ class TableAngularMimic extends LitElement {
   `;
 
   handleSlotChange(e) {
-    const childNodes = e.target.assignedNodes({ flatten: true });
-    let slotsFound = false;
-    childNodes.forEach((node) => {
-      const columnDef = node.getAttribute('columndef');
-      if (columnDef) {
-        const th = node.querySelector('th');
-        this._headerCells.push(th);
+    try {
+      const childNodes = e.target.assignedNodes({ flatten: true });
+      let slotsFound = false;
+      childNodes.forEach((node) => {
+        console.log('node', node);
+        console.log(node.getAttribute('columndef'));
+        const columnDef = node.getAttribute('columndef');
+        console.log('columnDef', columnDef);
+        if (columnDef) {
+          const th = node.querySelector('th');
 
-        slotsFound = true;
+          this._headerCells.push(th);
 
-        const td = node.querySelector('td');
-        const template = Handlebars.compile(td.innerHTML);
-        const cellDef = td.getAttribute('cellDef');
-        const expressions = cellDef
-          .split(';')
-          .filter(Boolean)
-          .map((e) => e.split('='));
-        const parseExpression = (expression, args) => {
-          const key = expression[0].split('let').pop().trim();
-          if (expression.length === 1) {
+          slotsFound = true;
+
+          const td = node.querySelector('td');
+          const template = Handlebars.compile(td.innerHTML);
+          const cellDef = td.getAttribute('cellDef');
+          const expressions = cellDef
+            .split(';')
+            .filter(Boolean)
+            .map((e) => e.split('='));
+          const parseExpression = (expression, args) => {
+            const key = expression[0].split('let').pop().trim();
+            if (expression.length === 1) {
+              return {
+                [key]: this.data[args.index],
+              };
+            }
+
+            const val = expression[1].trim();
             return {
-              [key]: this.data[args.index],
+              [key]: args[val],
             };
-          }
-
-          const val = expression[1].trim();
-          return {
-            [key]: args[val],
           };
-        };
-        this._cellRenderers.push((index) => {
-          const parsedExpressions = expressions.reduce(
-            (obj, e) => ({ ...obj, ...parseExpression(e, { index }) }),
-            {}
-          );
-          return html`<td>${unsafeHTML(template(parsedExpressions))}</td>`;
-        });
-      }
-    });
-
-    if (slotsFound) {
-      this.shadowRoot.querySelectorAll('slot').forEach((slot) => {
-        this.shadowRoot.removeChild(slot as any);
+          this._cellRenderers.push((index) => {
+            const parsedExpressions = expressions.reduce(
+              (obj, e) => ({ ...obj, ...parseExpression(e, { index }) }),
+              {}
+            );
+            return html`<td>${template(parsedExpressions)}</td>`;
+          });
+        }
       });
-      this.requestUpdate();
+
+      if (slotsFound) {
+        this.shadowRoot.querySelectorAll('slot').forEach((slot) => {
+          this.shadowRoot.removeChild(slot as any);
+        });
+        this.requestUpdate();
+      }
+    } catch (err) {
+      debugger;
     }
   }
 
