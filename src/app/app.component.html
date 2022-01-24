@@ -1,45 +1,50 @@
 <tm-page>
-<div slot="body">
-  <div id="container">
-    <h1>Example of a Table that renders cells via a render method:</h1>
-    <web-component-table-accepting-a-render-method [data]="data" [cols]="cols" [renderCell]="renderCell"></web-component-table-accepting-a-render-method>
+  <div slot="body">
+    <div id="container">
+      <h1>Example of a Table that renders cells via a render method:</h1>
+      <web-component-table-accepting-a-render-method
+        [data]="data"
+        [cols]="cols"
+        [renderCell]="renderCell"
+      ></web-component-table-accepting-a-render-method>
 
+      <h1>
+        Example of a Table that by default renders strings, and accepts
+        rendering overrides via named slots:
+      </h1>
+      <web-component-table-accepting-rendering-via-slots
+        [data]="data"
+        [cols]="cols"
+      >
+        <ng-container *ngFor="let row of data; let rowId = index">
+          <div slot="data-{{ rowId }}-3">
+            <a href="detail/{{ rowId }}">Link for {{ rowId }}</a>
+          </div>
+        </ng-container>
+      </web-component-table-accepting-rendering-via-slots>
 
+      <h1>Example of a Table composed with exported web components</h1>
+      <web-component-table-inspired-by-html>
+        <web-component-table-inspired-by-html-thead slot="thead">
+          <th *ngFor="let col of cols">
+            {{ col }}
+          </th>
+        </web-component-table-inspired-by-html-thead>
+        <web-component-table-inspired-by-html-tbody slot="tbody">
+          <tr *ngFor="let row of data; let rowId = index">
+            <td *ngFor="let col of cols; let colId = index">
+              <div *ngIf="colId == 3; else cell">
+                <a href="detail/${{ rowId }}">Link for {{ rowId }}</a>
+              </div>
+              <ng-template #cell>
+                {{ row[colId] }}
+              </ng-template>
+            </td>
+          </tr>
+        </web-component-table-inspired-by-html-tbody>
+      </web-component-table-inspired-by-html>
 
-    <h1>Example of a Table that by default renders strings, and accepts rendering overrides via named slots:</h1>
-    <web-component-table-accepting-rendering-via-slots [data]="data" [cols]="cols">
-      <ng-container *ngFor="let row of data; let rowId = index">
-        <div slot="data-{{rowId}}-3">
-          <a href="detail/{{rowId}}">Link for {{rowId}}</a>
-        </div>
-      </ng-container>
-    </web-component-table-accepting-rendering-via-slots>
-
-
-
-    <h1>Example of a Table composed with exported web components</h1>
-    <web-component-table-inspired-by-html>
-      <web-component-table-inspired-by-html-thead slot="thead">
-        <th *ngFor="let col of cols">
-          {{ col }}
-        </th>
-      </web-component-table-inspired-by-html-thead>
-      <web-component-table-inspired-by-html-tbody slot="tbody">
-        <tr *ngFor="let row of data; let rowId = index">
-          <td *ngFor="let col of cols; let colId = index">
-            <div *ngIf="colId == 3; else cell">
-              <a href="detail/${{rowId}}">Link for {{rowId}}</a>
-            </div>
-            <ng-template #cell>
-              {{ row[colId] }}
-            </ng-template>
-          </td>
-        </tr>
-      </web-component-table-inspired-by-html-tbody>
-    </web-component-table-inspired-by-html>
-
-
-
+      <!-- 
     <h1>Example of a Table that is built to mimic Angular's MatTable</h1>
     <web-component-table-inspired-by-angular [data]="dataAsObjects" [cols]="cols">
       <div columnDef="name">
@@ -61,14 +66,13 @@
         </td>
       </div>
 
-      <!-- <tr mat-header-row *matHeaderRowDef="headers"></tr> -->
-      <!-- <tr mat-row *matRowDef="let row; columns: headers;"></tr> -->
-    </web-component-table-inspired-by-angular>
+    </web-component-table-inspired-by-angular> -->
 
-
-
-    <h1>Example of an Angular MatTable wrapped in a web component</h1>
-    <angular-table-wrapped-in-a-web-component [data]="data" [cols]="colKeys"></angular-table-wrapped-in-a-web-component>
+      <h1>Example of an Angular MatTable wrapped in a web component</h1>
+      <angular-table-wrapped-in-a-web-component
+        [data]="data"
+        [cols]="colKeys"
+      ></angular-table-wrapped-in-a-web-component>
+    </div>
   </div>
-</div>
 </tm-page>

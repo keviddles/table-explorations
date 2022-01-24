@@ -1,27 +1,35 @@
 import { define, html } from 'hybrids';
 
 define({
-  tag: 'web-component-table-built-as-html',
+  tag: 'web-component-table-inspired-by-html',
   render: () => html`
-    <style>#table { display: table; }</style>
+    <style>
+      #table {
+        display: table;
+      }
+    </style>
     <div id="table">
       <slot name="thead">default thead</slot>
       <slot name="tbody">default tbody</slot>
     </div>
-    `,
+  `,
 });
 
 define({
-  tag: 'web-component-table-built-as-html-thead',
+  tag: 'web-component-table-inspired-by-html-thead',
   render: () => html`
-    <style>.tr { display: table-row; }</style>
+    <style>
+      .tr {
+        display: table-row;
+      }
+    </style>
     <div class="tr"><slot></slot></div>
   `,
 });
 
 define({
   // this component purely to mirror the above thead component
-  tag: 'web-component-table-built-as-html-tbody',
+  tag: 'web-component-table-inspired-by-html-tbody',
   render: () => html`<slot></slot>`,
 });
 
@@ -44,10 +52,10 @@ export const styles = `
   a:hover {
     text-decoration: underline;
   }
-  web-component-table-built-as-html-thead {
+  web-component-table-inspired-by-html-thead {
     display: table-header-group;
   }
-  web-component-table-built-as-html-tbody {
+  web-component-table-inspired-by-html-tbody {
     display: table-row-group;
   }
 `;

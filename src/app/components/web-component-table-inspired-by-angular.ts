@@ -1,9 +1,8 @@
-import { LitElement, html, css, customElement, property } from 'lit-element';
-// import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-// import { customElement, property, state } from 'lit/decorators.js';
-// import { LitElement, html, css, TemplateResult } from 'lit';
+import { LitElement, html, css, TemplateResult } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 
-type CellRenderer = (rowId: number) => any;
+type CellRenderer = (rowId: number) => TemplateResult;
 
 const Handlebars = window['Handlebars'];
 
@@ -15,17 +14,18 @@ class TableAngularMimic extends LitElement {
   @property({ type: Array })
   cols: Array<string>;
 
-  @property()
+  @state()
   private _headerCells = [];
 
-  @property()
+  @state()
   private _cellRenderers: Array<CellRenderer> = [];
 
   static styles = css`
     table {
       border-collapse: collapse;
     }
-    table th, table td {
+    table th,
+    table td {
       text-align: left;
       padding: 10px;
     }
@@ -48,59 +48,51 @@ class TableAngularMimic extends LitElement {
   `;
 
   handleSlotChange(e) {
-    try {
-      const childNodes = e.target.assignedNodes({ flatten: true });
-      let slotsFound = false;
-      childNodes.forEach((node) => {
-        console.log('node', node);
-        console.log(node.getAttribute('columndef'));
-        const columnDef = node.getAttribute('columndef');
-        console.log('columnDef', columnDef);
-        if (columnDef) {
-          const th = node.querySelector('th');
+    const childNodes = e.target.assignedNodes({ flatten: true });
+    let slotsFound = false;
+    childNodes.forEach((node) => {
+      const columnDef = node.getAttribute('columndef');
+      if (columnDef) {
+        const th = node.querySelector('th');
+        this._headerCells.push(th);
 
-          this._headerCells.push(th);
+        slotsFound = true;
 
-          slotsFound = true;
-
-          const td = node.querySelector('td');
-          const template = Handlebars.compile(td.innerHTML);
-          const cellDef = td.getAttribute('cellDef');
-          const expressions = cellDef
-            .split(';')
-            .filter(Boolean)
-            .map((e) => e.split('='));
-          const parseExpression = (expression, args) => {
-            const key = expression[0].split('let').pop().trim();
-            if (expression.length === 1) {
-              return {
-                [key]: this.data[args.index],
-              };
-            }
-
-            const val = expression[1].trim();
+        const td = node.querySelector('td');
+        const template = Handlebars.compile(td.innerHTML);
+        const cellDef = td.getAttribute('cellDef');
+        const expressions = cellDef
+          .split(';')
+          .filter(Boolean)
+          .map((e) => e.split('='));
+        const parseExpression = (expression, args) => {
+          const key = expression[0].split('let').pop().trim();
+          if (expression.length === 1) {
             return {
-              [key]: args[val],
+              [key]: this.data[args.index],
             };
-          };
-          this._cellRenderers.push((index) => {
-            const parsedExpressions = expressions.reduce(
-              (obj, e) => ({ ...obj, ...parseExpression(e, { index }) }),
-              {}
-            );
-            return html`<td>${template(parsedExpressions)}</td>`;
-          });
-        }
-      });
+          }
 
-      if (slotsFound) {
-        this.shadowRoot.querySelectorAll('slot').forEach((slot) => {
-          this.shadowRoot.removeChild(slot as any);
+          const val = expression[1].trim();
+          return {
+            [key]: args[val],
+          };
+        };
+        this._cellRenderers.push((index) => {
+          const parsedExpressions = expressions.reduce(
+            (obj, e) => ({ ...obj, ...parseExpression(e, { index }) }),
+            {}
+          );
+          return html`<td>${unsafeHTML(template(parsedExpressions))}</td>`;
         });
-        this.requestUpdate();
       }
-    } catch (err) {
-      debugger;
+    });
+
+    if (slotsFound) {
+      this.shadowRoot.querySelectorAll('slot').forEach((slot) => {
+        this.shadowRoot.removeChild(slot as any);
+      });
+      this.requestUpdate();
     }
   }
 
@@ -117,13 +109,14 @@ class TableAngularMimic extends LitElement {
         <tbody>
           ${data?.map(
             (_, rowId) => html`
-            <tr>
-              ${this._cellRenderers.map((cellRenderer) => cellRenderer(rowId))}
-            </tr>
-          `
+              <tr>
+                ${this._cellRenderers.map((cellRenderer) =>
+                  cellRenderer(rowId)
+                )}
+              </tr>
+            `
           )}
         </tbody>
-
       </table>
     `;
   }
