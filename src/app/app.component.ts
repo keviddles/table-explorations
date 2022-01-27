@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { data, cols } from './fake-data';
+import { html } from 'hybrids';
+
 import './components/web-component-table-accepting-a-render-method';
 import './components/web-component-table-accepting-rendering-via-slots';
 import './components/angular-table-wrapped-in-a-web-component';
