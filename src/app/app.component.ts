@@ -18,4 +18,10 @@ export class AppComponent {
   dataAsObjects = data;
   cols = cols.map((col) => col.name);
   colKeys = cols.map((col) => col.key);
+  renderCell(rowId: number, colId: number) {
+    if (colId === 3) {
+      return html`<a href="detail/${rowId}">Link for ${rowId}</a>`;
+    }
+    return data[rowId][cols[colId].key];
+  }
 }
